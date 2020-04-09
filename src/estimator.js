@@ -1,25 +1,26 @@
-const dayFactor = (input) => Math.trunc(input / 3);
-const weekFactor = (input) => Math.trunc((input * 7) / 3);
-const MonthFactor = (input) => Math.trunc((input * 30) / 3);
+const covid19ImpactEstimator = (data) => {
+  const impact = {};
+  const severeImpact = {};
 
-const covid19ImpactEstimator = (data) => ({
-  data,
-  impact: {
-    currentlyInfected: data.reportedCases * 10,
-    infectionsByRequestedTime: {
-      days: this.currentlyInfected * (2 ** dayFactor(28)),
-      weeks: this.currentlyInfected * (2 ** weekFactor(28)),
-      months: this.currentlyInfected * (2 ** MonthFactor(28))
-    }
-  },
-  severeImpact: {
-    currentlyInfected: data.reportedCases * 50,
-    infectionsByRequestedTime: {
-      days: this.currentlyInfected * (2 ** dayFactor(28)),
-      weeks: this.currentlyInfected * (2 ** weekFactor(28)),
-      months: this.currentlyInfected * (2 ** MonthFactor(28))
-    }
+  if (data.periodType === 'weeks') {
+    data.timeToElapse *= 7;
+  } else if (data.periodType === 'months') {
+    data.timeToElapse *= 30;
   }
-});
+  const days = data.timeToElapse;
+  const factor = Math.trunc(days / 3);
+
+  impact.currentlyInfected = data.reportedCases * 10;
+  severeImpact.currentlyInfected = data.reportedCases * 50;
+
+  impact.infectionsByRequestedTime = impact.currentlyInfected * (2 ** factor);
+  severeImpact.infectionsByRequestedTime = severeImpact.currentlyInfected * (2 ** factor);
+
+  return {
+    data,
+    impact,
+    severeImpact
+  };
+};
 
 export default covid19ImpactEstimator;
